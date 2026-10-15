@@ -12,9 +12,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import * as Haptics from 'expo-haptics';
 import { GooShape } from './GooShape';
-import { playToastSound } from './sound';
+import { playFeedback } from './feedback';
 import { removeToast, toast } from './store';
 import { ACCENT, BODY_MAX, FILL, GLYPH, MAX_W, OVERLAP, PAD, PILL_H, SPRING, isDarkFill } from './theme';
 import type { ToastItem, ToastState } from './types';
@@ -26,27 +25,6 @@ interface Props {
 }
 
 const BADGE = 20;
-
-function playHaptic(state: ToastState) {
-  const done = () => {};
-  switch (state) {
-    case 'success':
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(done);
-      break;
-    case 'error':
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(done);
-      break;
-    case 'warning':
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(done);
-      break;
-    case 'info':
-    case 'action':
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(done);
-      break;
-    default:
-      break;
-  }
-}
 
 export function GooeyToast({ item, theme, offset }: Props) {
   const { width: screenW } = useWindowDimensions();
@@ -124,10 +102,9 @@ export function GooeyToast({ item, theme, offset }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shown.version, targetPillW, targetBodyH]);
 
-  // ---- haptic + sound per state -----------------------------------------------
+  // ---- optional haptic + sound (no-ops unless the add-ons are enabled) --------
   useEffect(() => {
-    if (shown.haptics !== false) playHaptic(shown.state);
-    playToastSound(shown.state, shown.sound);
+    playFeedback(shown.state, shown.haptics, shown.sound);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shown.version]);
 
