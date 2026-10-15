@@ -15,8 +15,10 @@ Inspired by [Sileo](https://github.com/hiaaryan/sileo) by Aaryan (MIT), rebuilt 
 ## Install
 
 ```sh
-bunx expo install react-native-goo-toast @shopify/react-native-skia react-native-reanimated react-native-gesture-handler react-native-safe-area-context expo-haptics expo-audio
+bunx expo install react-native-goo-toast @shopify/react-native-skia react-native-reanimated react-native-gesture-handler react-native-safe-area-context
 ```
+
+Haptics and sounds are optional add-ons. Skip them and you never install `expo-haptics` or `expo-audio`.
 
 Until it's on npm, install from GitHub:
 
@@ -90,24 +92,42 @@ One toast is visible per position. Firing another at the same position morphs th
 | `fill` | `string` | theme | Shape colour; text adapts to it |
 | `roundness` | `number` | `18` | Body corner radius |
 | `button` | `{ label, onPress }` | | Action button in the body |
-| `haptics` | `boolean` | `true` | Haptic per state |
-| `sound` | `ToastSound \| false` | Toaster's | Sound for this toast |
+| `haptics` | `boolean` | `true` | Haptic for this toast, when enabled |
+| `sound` | `ToastSound \| false` | state's | Sound for this toast, when enabled |
 
-`<Toaster>` props: `position`, `theme` (`light` \| `dark` \| `system`), `offset`, `options` (defaults for every toast), `sounds` (per-state map or `false`), `volume` (0 to 1, default 0.5).
+`<Toaster>` props: `position`, `theme` (`light` \| `dark` \| `system`), `offset`, `options` (defaults for every toast).
 
-## Sounds
+## Haptics and sounds (optional)
 
-Every state plays a short sound alongside its haptic. The built-in set is CC0 by [Kenney](https://kenney.nl), picked from [soundcn](https://soundcn.xyz): `success-chime`, `error-buzz`, `glass-001` (warning), `notification-pop` (info), `confirmation-001` (action). Loading is silent.
+Both are off by default and live in separate entry points, so the core never imports `expo-haptics` or `expo-audio`. Turn on either, both, or neither, once at startup.
 
-Sounds mix with the user's music instead of pausing it, and stay quiet when the iPhone is on silent, like system keyboard clicks.
+```sh
+bunx expo install expo-haptics   # for haptics
+bunx expo install expo-audio     # for sounds
+```
 
-```tsx
-<Toaster sounds={{ success: require('./assets/sounds/coin.mp3') }} volume={0.4} />
-<Toaster sounds={false} /> // all off
+```ts
+// app/_layout.tsx
+import { enableHaptics } from 'react-native-goo-toast/haptics';
+import { enableSounds } from 'react-native-goo-toast/sounds';
+
+enableHaptics();                       // success/error/warning notification, light tap for info/action
+enableSounds({ volume: 0.4 });         // bundled set below
+```
+
+Customise or silence per state, or per toast:
+
+```ts
+enableHaptics({ info: false });
+enableSounds({ sounds: { success: require('./assets/sounds/coin.mp3'), info: false } });
 
 toast.success({ title: 'Level up', sound: require('./assets/sounds/fanfare.mp3') });
-toast.info({ title: 'Quiet one', sound: false });
+toast.error({ title: 'Quiet one', sound: false, haptics: false });
 ```
+
+`disableHaptics()` and `disableSounds()` turn them off again, e.g. from a settings toggle.
+
+The bundled sounds are CC0 by [Kenney](https://kenney.nl), picked from [soundcn](https://soundcn.xyz): `success-chime`, `error-buzz`, `glass-001` (warning), `notification-pop` (info), `confirmation-001` (action). Loading is silent. By default they mix with the user's music instead of pausing it and stay quiet on silent mode; pass `configureAudioSession: false` if your app manages its own audio session.
 
 ### soundcn, for mobile
 
@@ -137,6 +157,14 @@ In `src/theme.ts`:
 ## Playground
 
 `example/ToastPlayground.tsx` fires every state at every position, like Sileo's playground. Drop it into an Expo Router app as a screen.
+
+## Phases
+
+1. Goo shape and morph playground (built)
+2. Store, Toaster, positions, gestures, timers (built)
+3. Promise morphing, themes, reduced motion (built)
+4. Optional sound and haptic effects (built: `/haptics`, `/sounds`, `goo-sound` CLI)
+5. Performance pass, tests, Maestro flow, npm publish
 
 ## Roadmap
 
