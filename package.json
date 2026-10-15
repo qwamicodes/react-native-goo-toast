@@ -1,6 +1,6 @@
 {
   "name": "react-native-goo-toast",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Gooey, physics-based morphing toasts for React Native. Skia goo filter + Reanimated springs, all on the UI thread.",
   "main": "src/index.ts",
   "react-native": "src/index.ts",
@@ -64,5 +64,28 @@
   },
   "bin": {
     "goo-sound": "bin/goo-sound.mjs"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./haptics": {
+      "types": "./src/haptics.ts",
+      "default": "./src/haptics.ts"
+    },
+    "./sounds": {
+      "types": "./src/sounds.ts",
+      "default": "./src/sounds.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "peerDependenciesMeta": {
+    "expo-haptics": {
+      "optional": true
+    },
+    "expo-audio": {
+      "optional": true
+    }
   }
 }
