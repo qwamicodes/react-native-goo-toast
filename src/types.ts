@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import type { ToastSound } from './sound';
+/** A sound: `require('./ding.mp3')`, a file or remote URI, or `false` for silence. */
+export type ToastSound = number | string | { uri: string } | false;
 
 export type ToastState = 'success' | 'error' | 'warning' | 'info' | 'action' | 'loading';
 
@@ -37,9 +38,9 @@ export interface ToastOptions {
   roundness?: number;
   /** Optional action button rendered in the body. */
   button?: ToastButton;
-  /** Play a haptic matching the state. Default true. */
+  /** Haptic for this toast, when `enableHaptics()` is on. `false` skips it. */
   haptics?: boolean;
-  /** Sound for this toast. Defaults to the Toaster's sound for the state; `false` mutes it. */
+  /** Sound for this toast, when `enableSounds()` is on. Overrides the state's sound; `false` mutes it. */
   sound?: ToastSound;
 }
 
